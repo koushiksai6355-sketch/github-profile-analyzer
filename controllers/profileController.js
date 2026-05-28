@@ -60,6 +60,16 @@ exports.analyzeProfile = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: "Internal Server Error" });
     }
+    // Inside your analyzeProfile function:
+} catch (error) {
+    console.error("Analysis Route Failed. Reason:", error.message);
+    
+    // Send the real error message back to Postman so you can read it instantly
+    res.status(500).json({ 
+        error: "Analysis Failed", 
+        details: error.message 
+    });
+}
 };
 
 exports.getAllProfiles = async (req, res) => {
