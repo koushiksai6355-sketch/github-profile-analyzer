@@ -54,22 +54,21 @@ exports.analyzeProfile = async (req, res) => {
         });
 
     } catch (error) {
+        // Handle explicit GitHub 404s cleanly
         if (error.response && error.response.status === 404) {
             return res.status(404).json({ error: "GitHub user not found" });
         }
-        console.error(error);
-        res.status(500).json({ error: "Internal Server Error" });
+        
+        // Print the real error message safely inside Render logs
+        console.error("Analysis Route Failed. Reason:", error.message);
+        
+        // Expose the raw error string to your browser/Postman window
+        res.status(500).json({ 
+            error: "Analysis Failed", 
+            message: error.message,
+            stack: error.stack
+        });
     }
-    // Inside your analyzeProfile function:
-} catch (error) {
-    console.error("Analysis Route Failed. Reason:", error.message);
-    
-    // Send the real error message back to Postman so you can read it instantly
-    res.status(500).json({ 
-        error: "Analysis Failed", 
-        details: error.message 
-    });
-}
 };
 
 exports.getAllProfiles = async (req, res) => {
@@ -77,7 +76,7 @@ exports.getAllProfiles = async (req, res) => {
         const list = await Profile.getAll();
         res.status(200).json({ count: list.length, profiles: list });
     } catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ error: "Internal Server Error", message: error.message });
     }
 };
 
@@ -88,6 +87,6 @@ exports.getProfileByUsername = async (req, res) => {
         
         res.status(200).json({ data: profile });
     } catch (error) {
-        res.status(500).json({ error: "Internal Server Error" });
+        res.status(500).json({ error: "Internal Server Error", message: error.message });
     }
 };
