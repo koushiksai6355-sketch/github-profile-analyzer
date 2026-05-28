@@ -9,9 +9,17 @@ exports.analyzeProfile = async (req, res) => {
     }
 
     try {
-        // 1. Fetch data from GitHub API
-        const profileResponse = await axios.get(`https://api.github.com/users/${username}`);
-        const reposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100`);
+        // 🚀 Set up authenticated configuration to bypass GitHub shared hosting rate limits
+        const axiosConfig = {
+            headers: {
+                'User-Agent': 'Github-Profile-Analyzer-App',
+                'Authorization': `token ${process.env.GITHUB_TOKEN}`
+            }
+        };
+
+        // 1. Fetch data from GitHub API with credentials
+        const profileResponse = await axios.get(`https://api.github.com/users/${username}`, axiosConfig);
+        const reposResponse = await axios.get(`https://api.github.com/users/${username}/repos?per_page=100`, axiosConfig);
 
         const profileData = profileResponse.data;
         const reposData = reposResponse.data;
